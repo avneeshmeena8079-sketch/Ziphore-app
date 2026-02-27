@@ -3,28 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zyphor Ultimate Holographic Delivery</title>
+<title>Zyphore Holographic Delivery</title>
 <style>
 body { margin:0; font-family:sans-serif; background:#0d0d0d; color:white; overflow-x:hidden; }
-header { text-align:center; padding:20px; font-size:24px; background:linear-gradient(90deg,#4b6cb7,#182848);}
-.tagline { font-size:16px; color:#ffd700;}
+header { text-align:center; padding:15px; font-size:24px; background:linear-gradient(90deg,#4b6cb7,#182848);}
+.tagline { font-size:16px; color:#ffd700; display:block; margin-top:5px; }
 #login,#otp-section {display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh;}
-#login input,#login button,#otp-section input,#otp-section button { padding:10px; margin:10px; border-radius:5px; border:none;}
+#login input,#login button,#otp-section input,#otp-section button { padding:10px; margin:10px; border-radius:5px; border:none; width:80%;}
 #login button,#otp-section button { background:#4b6cb7; color:white; cursor:pointer;}
-#app { display:none; padding:20px;}
+#app { display:none; padding:10px; max-width:480px; margin:auto; }
 #profile { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
 #profile img { width:60px; height:60px; border-radius:50%; border:2px solid #ffd700; }
 #profile div { font-size:16px; }
-#products { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
-.product { background:#222; border-radius:15px; padding:15px; text-align:center; transition: transform 0.2s; cursor:pointer; box-shadow: 0 0 15px #4b6cb7;}
+#products { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:15px; }
+.product { background:#222; border-radius:10px; padding:10px; text-align:center; transition: transform 0.2s; cursor:pointer; box-shadow:0 0 10px #4b6cb7;}
 .product:hover { transform:scale(1.05);}
-.product img { width:100%; height:180px; object-fit:cover; border-radius:10px;}
-.product button { margin-top:10px; padding:8px 12px; border:none; border-radius:5px; background:#4b6cb7; color:white; cursor:pointer;}
-#cart { margin-top:20px; background:#222; padding:15px; border-radius:10px; box-shadow: 0 0 15px #ffd700;}
-#cart ul { list-style:none; padding:0; max-height:150px; overflow-y:auto;}
+.product img { width:100%; height:120px; object-fit:cover; border-radius:8px;}
+.product button { margin-top:8px; padding:6px 10px; border:none; border-radius:5px; background:#4b6cb7; color:white; cursor:pointer;}
+#cart { margin-top:15px; background:#222; padding:10px; border-radius:10px; box-shadow:0 0 15px #ffd700;}
+#cart ul { list-style:none; padding:0; max-height:120px; overflow-y:auto;}
 #cart li { padding:5px 0; border-bottom:1px solid #444; display:flex; justify-content:space-between; }
-#avatar-container { width:300px; height:400px; margin:auto; filter: drop-shadow(0 0 20px #4b6cb7);}
-#mic-button { margin-top:20px; padding:10px 15px; border:none; border-radius:5px; background:#ffd700; color:#111; cursor:pointer;}
+#avatar-container { width:100%; height:300px; margin:auto; filter: drop-shadow(0 0 15px #4b6cb7);}
+#mic-button { margin-top:10px; padding:8px 12px; border:none; border-radius:5px; background:#ffd700; color:#111; cursor:pointer; width:80%;}
 #neon-bg { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; }
 </style>
 </head>
@@ -33,7 +33,7 @@ header { text-align:center; padding:20px; font-size:24px; background:linear-grad
 <div id="neon-bg"></div>
 
 <header>
-    Zyphor Ultimate Holographic Delivery<br>
+    Zyphore<br>
     <span class="tagline">Virtual Presence, Real Delivery</span>
 </header>
 
@@ -53,7 +53,7 @@ header { text-align:center; padding:20px; font-size:24px; background:linear-grad
     <div id="profile">
         <div id="avatar-container"></div>
         <div>
-            <div id="user-name">Customer</div>
+            <div id="user-name">Avneesh Meena</div>
             <div id="user-mobile"></div>
         </div>
     </div>
@@ -65,7 +65,7 @@ header { text-align:center; padding:20px; font-size:24px; background:linear-grad
         <h3>Your Orders</h3>
         <ul id="cart-items"></ul>
         <strong>Total: ₹<span id="total">0</span></strong><br>
-        <button onclick="placeOrder()" style="margin-top:10px; padding:8px 15px; border:none; border-radius:5px; background:#4b6cb7; color:white; cursor:pointer;">Place Order</button>
+        <button onclick="placeOrder()">Place Order</button>
     </div>
 
     <button id="mic-button" onclick="startMic()">🎤 Speak to Order</button>
@@ -106,10 +106,9 @@ const products=[
 ];
 
 function initApp(){
-    document.getElementById("user-name").textContent="Customer";
     document.getElementById("user-mobile").textContent=userMobile;
     loadProducts();
-    speak("Namaste! Main aapka holographic delivery assistant hoon. Aap apna order bol sakte hain.");
+    speak("Namaste Avneesh Meena! Main aapka holographic delivery assistant hoon. Aap apna order bol sakte hain.");
 }
 function loadProducts(){
     const container=document.getElementById("products"); container.innerHTML="";
@@ -136,7 +135,7 @@ function renderCart(){
 }
 function placeOrder(){
     if(cart.length===0){ speak("Aapka cart khali hai."); return;}
-    speak("Aapka order confirm ho gaya. Dhanyavaad!");
+    speak("Aapka order confirm ho gaya. Dhanyavaad Avneesh Meena!");
     cart=[]; renderCart();
 }
 
@@ -152,11 +151,11 @@ function processOrder(text){
     if(found){ addToCart(products.indexOf(found)); } else speak("Maf kijiye, ye item menu me nahi hai.");
 }
 
-// 3D Avatar Full Body Simulation
+// 3D Avatar
 const containerAvatar=document.getElementById("avatar-container");
 const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(75,300/400,0.1,1000);
-const renderer=new THREE.WebGLRenderer({antialias:true, alpha:true}); renderer.setSize(300,400);
+const camera=new THREE.PerspectiveCamera(75,containerAvatar.offsetWidth/containerAvatar.offsetHeight,0.1,1000);
+const renderer=new THREE.WebGLRenderer({antialias:true, alpha:true}); renderer.setSize(containerAvatar.offsetWidth, containerAvatar.offsetHeight);
 containerAvatar.appendChild(renderer.domElement);
 const controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableZoom=false; controls.enablePan=false;
 const light=new THREE.DirectionalLight(0xffffff,1); light.position.set(0,1,1).normalize(); scene.add(light);
@@ -178,12 +177,4 @@ neonAnimate();
 </script>
 
 </body>
-    <header>
-    Zyphore<br>
-    <span class="tagline">Virtual Presence, Real Delivery</span>
-    </header>
 </html>
-<header>
-    Zyphore<br>
-    <span class="tagline">Virtual Presence, Real Delivery</span>
-</header>
