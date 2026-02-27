@@ -3,186 +3,171 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zyphor Ultimate Holographic App</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<title>Ziphore Holographic Delivery</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
-body{background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:white;overflow-x:hidden;}
-/* LOGIN */
-#loginScreen{height:100vh;display:flex;justify-content:center;align-items:center;flex-direction:column;text-align:center;}
-#loginScreen h2{color:#00fff7;font-size:28px;margin-bottom:5px;}
-#loginScreen p.tagline{color:#ff416c;font-size:16px;margin-bottom:15px;font-style:italic;}
-input{padding:10px;margin:10px;width:220px;border:none;border-radius:6px;}
-button{padding:10px 15px;background:#00fff7;color:black;border:none;border-radius:20px;cursor:pointer;font-weight:600;transition:0.3s;}
-button:hover{transform:scale(1.05);}
+body{
+  margin:0;font-family:sans-serif;background:#0b0b0b;color:#fff;overflow-x:hidden;
+}
+/* Holographic gradient background */
+body::before{
+  content:"";
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:linear-gradient(45deg,#00f,#0ff,#f0f,#0f0);
+  background-size:400% 400%;
+  filter:blur(50px) brightness(0.4);
+  animation:gradientAnim 20s ease infinite;
+  z-index:-1;
+}
+@keyframes gradientAnim{0%{background-position:0% 50%;}50%{background-position:100% 50%;}100%{background-position:0% 50%;}}
 
-/* FOOD CARDS */
-.container{padding:15px;display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:15px;}
-.card{background:rgba(255,255,255,0.05);border-radius:15px;overflow:hidden;backdrop-filter:blur(6px);box-shadow:0 0 15px cyan;transition:0.3s;}
-.card:hover{transform:translateY(-5px) scale(1.03);box-shadow:0 0 25px cyan;}
-.card img{width:100%;height:120px;object-fit:cover;border-radius:10px;filter:drop-shadow(0 0 8px cyan);}
-.card-content{padding:10px;text-align:center;}
-.price{color:#00ffea;font-weight:600;margin:5px 0;}
-.btn{background:#00fff7;color:black;padding:6px 10px;border:none;border-radius:20px;cursor:pointer;font-size:12px;transition:0.2s;margin:2px;}
-.btn:hover{background:#ff416c;color:white;transform:scale(1.1);}
+/* Center container */
+.center{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;text-align:center;}
 
-/* Cart Button */
-.cart-btn{position:fixed;bottom:20px;right:20px;background:#ff416c;color:white;padding:15px;border-radius:50%;font-size:18px;box-shadow:0 0 15px cyan;cursor:pointer;transition:0.3s;}
-.cart-btn:hover{transform:scale(1.1);}
+/* Inputs and buttons */
+input{padding:10px;margin:5px;border-radius:5px;border:none;outline:none;background:rgba(255,255,255,0.1);color:#0ff;}
+button{background:transparent;border:2px solid #0ff;color:#0ff;padding:10px 20px;margin:5px;border-radius:10px;font-weight:bold;cursor:pointer;text-transform:uppercase;box-shadow:0 0 10px #0ff, 0 0 20px #0ff inset;transition:0.3s;}
+button:hover{background:#0ff;color:#000;box-shadow:0 0 20px #0ff,0 0 30px #0ff inset;}
 
-/* Modal */
-.modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;z-index:1000;}
-.box{background:rgba(10,26,42,0.95);width:90%;max-width:400px;border-radius:15px;padding:20px;text-align:center;color:white;backdrop-filter:blur(10px);}
-.cart-item{display:flex;justify-content:space-between;margin-bottom:10px;font-size:14px;}
-.total{font-weight:600;margin-top:10px;}
-.close{background:#ff416c;color:white;padding:8px;border:none;border-radius:20px;width:100%;margin-top:10px;cursor:pointer;}
+/* Holographic floating animations */
+#holographicBoy img{width:150px;animation:float 3s infinite alternate, glow 1.5s infinite alternate;filter:drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #0ff);}
+@keyframes float{0%{transform:translateY(0);}100%{transform:translateY(-15px);}}
+@keyframes glow{0%{filter:drop-shadow(0 0 5px #0ff);}100%{filter:drop-shadow(0 0 25px #0ff);}}
 
-/* HOLOGRAPHIC 3D DELIVERY BOY */
-.holo-container{position:fixed;bottom:100px;left:20px;width:120px;text-align:center;animation:float 3s infinite, rotateHolo 8s infinite linear;z-index:999;cursor:pointer;}
-.holo-container img{width:120px;border-radius:50%;border:2px solid cyan;box-shadow:0 0 25px cyan,0 0 50px #00fff7,0 0 80px #00fff7;}
-.chat-bubble{position:fixed;bottom:220px;left:150px;background:rgba(0,255,255,0.2);padding:10px 15px;border-radius:15px;color:white;max-width:220px;display:none;animation:fadein 0.5s forwards;backdrop-filter:blur(6px);}
+/* Profile */
+#profileDiv img{width:100px;height:100px;border-radius:50%;margin-bottom:10px;filter:drop-shadow(0 0 10px #0ff);}
 
-/* Animations */
-@keyframes float{0%{transform:translateY(0);}50%{transform:translateY(-15px);}100%{transform:translateY(0);}}
-@keyframes fadein{from{opacity:0;}to{opacity:1;}}
-@keyframes rotateHolo{0%{transform:rotateY(0deg);}100%{transform:rotateY(360deg);}}
+/* Chat box */
+#chatBox{position:fixed;bottom:20px;right:20px;background:#111;padding:10px;border-radius:10px;width:250px;box-shadow:0 0 15px #0ff inset,0 0 30px #0ff;}
+#chatMessages{height:100px;overflow-y:auto;margin-bottom:5px;}
+
+/* Notifications */
+.notification{position:fixed;bottom:20px;left:20px;background:#0ff;color:#000;padding:10px 20px;border-radius:10px;box-shadow:0 0 15px #0ff,0 0 30px #0ff inset;font-weight:bold;}
+
+/* Holographic text */
+h1,h2,p{color:#0ff;text-shadow:0 0 5px #0ff,0 0 10px #0ff,0 0 20px #0ff;}
+
+/* Floating order icons */
+.floatingIcon{position:absolute;width:15px;height:15px;border-radius:50%;background:#0ff;opacity:0.5;animation:floatIcon linear infinite;}
+@keyframes floatIcon{0%{transform:translateY(0);}100%{transform:translateY(-800px);}}
+
+/* 3D holographic menu cards */
+.menuContainer{display:flex;flex-wrap:wrap;justify-content:center;margin-top:20px;}
+.menuCard{width:120px;height:160px;background:rgba(0,255,255,0.1);margin:10px;border-radius:15px;box-shadow:0 0 15px #0ff inset,0 0 30px #0ff;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:transform 0.5s;perspective:800px;cursor:pointer;}
+.menuCard:hover{transform:rotateY(15deg) rotateX(10deg) scale(1.05);}
+
+/* Spinning order items */
+.spinningItem{position:absolute;width:30px;height:30px;border-radius:50%;background:#0ff;opacity:0.7;animation:spinItem linear infinite;}
+@keyframes spinItem{0%{transform:rotate(0deg) translateY(0);}50%{transform:rotate(180deg) translateY(-20px);}100%{transform:rotate(360deg) translateY(0);}}
+
+/* Containers hidden by default */
+#loginDiv,#profileDiv,#chatBox,#holographicBoy,#mapContainer,#menuSection{display:none;}
+#loginDiv{display:flex;background:#111;padding:20px;border-radius:10px;box-shadow:0 0 20px #0ff;}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
-<div id="loginScreen">
-<h2>Zyphor Login</h2>
-<p class="tagline">Virtual Presence, Real Delivery</p>
-<input type="text" id="mobile" placeholder="Enter Mobile Number">
-<button onclick="sendOTP()">Send OTP</button>
-<div id="otpSection" style="display:none;">
-<input type="text" id="otp" placeholder="Enter OTP">
-<button onclick="verifyOTP()">Verify OTP</button>
-</div>
+<!-- Login -->
+<div class="center" id="loginDiv">
+  <h1>Ziphore Login</h1>
+  <input type="text" id="phone" placeholder="Enter Mobile Number">
+  <button onclick="sendOTP()">Send OTP</button>
+  <input type="text" id="otp" placeholder="Enter OTP">
+  <button onclick="verifyOTP()">Verify OTP</button>
 </div>
 
-<!-- FOOD APP -->
-<div id="appScreen" style="display:none;">
-<header style="text-align:center;font-size:22px;font-weight:600;margin:10px;color:#00fff7;">Zyphor - Holographic Delivery</header>
-<div class="container" id="foodContainer"></div>
-<div class="cart-btn" onclick="openCart()">🛒</div>
+<!-- Profile -->
+<div class="center" id="profileDiv">
+  <img id="profilePic" src="https://via.placeholder.com/100" alt="Profile Photo">
+  <h2 id="userName">User Name</h2>
+  <p id="userEmail">user@example.com</p>
+  <button onclick="showHolographicBoy()">Start Delivery</button>
 </div>
 
-<!-- CART MODAL -->
-<div class="modal" id="cartModal">
-<div class="box">
-<h3 style="color:#00fff7;">Your Cart</h3>
-<div id="cartItems"></div>
-<p id="total"></p>
-<button class="btn" onclick="checkout()">Checkout</button><br><br>
-<button class="btn" onclick="closeCart()">Close</button>
-</div>
+<!-- Holographic Delivery Boy -->
+<div class="center" id="holographicBoy">
+  <img src="https://i.gifer.com/7efs.gif" alt="Holographic Delivery Boy">
+  <p id="deliveryMessage">Hello! Your order is on the way!</p>
+  <button onclick="showMap()">Track Order</button>
+  <button onclick="showMenu()">View 3D Menu</button>
 </div>
 
-<!-- HOLOGRAPHIC DELIVERY BOY -->
-<div class="holo-container" onclick="talkHolo()">
-<img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png">
-<div class="chat-bubble" id="chatBubble">Hello! Tap on me to order 🎤</div>
+<!-- Map -->
+<div class="center" id="mapContainer">
+  <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3153.0193537862715!2d144.95373631549947!3d-37.81720977975151!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad65d43f1f7d351%3A0x5045675218ce7e0!2sMelbourne%20VIC%2C%20Australia!5e0!3m2!1sen!2sin!4v1600000000000!5m2!1sen!2sin" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+  <button onclick="showChat()">Chat with Delivery Boy</button>
+  <button onclick="startVoice()">Talk to Delivery Boy</button>
+</div>
+
+<!-- 3D Menu Section -->
+<div class="center" id="menuSection">
+  <h2>3D Holographic Menu</h2>
+  <div class="menuContainer">
+    <div class="menuCard">Pizza</div>
+    <div class="menuCard">Burger</div>
+    <div class="menuCard">Sushi</div>
+    <div class="menuCard">Pasta</div>
+    <div class="menuCard">Salad</div>
+  </div>
+</div>
+
+<!-- Chat Box -->
+<div id="chatBox">
+  <div id="chatMessages"></div>
+  <input type="text" id="chatInput" placeholder="Type a message...">
+  <button onclick="sendMessage()">Send</button>
 </div>
 
 <script>
-let cart=[];
-let generatedOTP="";
-let foodItems=[
-{name:"Pizza",price:199,img:"https://images.unsplash.com/photo-1600891964599-f61ba0e24092"},
-{name:"Burger",price:149,img:"https://images.unsplash.com/photo-1550547660-d9450f859349"},
-{name:"Biryani",price:249,img:"https://images.unsplash.com/photo-1604908176997-125f25cc6f3d"},
-{name:"Paneer Butter Masala",price:180,img:"https://source.unsplash.com/100x100/?paneer"},
-{name:"Hakka Noodles",price:120,img:"https://source.unsplash.com/100x100/?noodles"}
-];
+// === Double coding removal flags ===
+let otpSent=false,otpVerified=false,deliveryStarted=false,chatVisible=false,menuVisible=false;
 
-/* LOGIN OTP */
-function sendOTP(){
-let mobile=document.getElementById("mobile").value;
-if(mobile.length!==10){alert("Enter valid 10-digit number");return;}
-generatedOTP="1234"; alert("Demo OTP: 1234");
-document.getElementById("otpSection").style.display="block";
-}
-function verifyOTP(){
-let otp=document.getElementById("otp").value;
-if(otp===generatedOTP){
-document.getElementById("loginScreen").style.display="none";
-document.getElementById("appScreen").style.display="block";
-renderMenu();
-speak("Welcome Avneesh to Zyphor colored holographic delivery!");
-}else{alert("Wrong OTP");}
-}
+// OTP login simulation
+function sendOTP(){if(otpSent) return; let phone=document.getElementById('phone').value;if(phone){alert("OTP sent to "+phone);otpSent=true;}}
+function verifyOTP(){if(otpVerified) return; let otp=document.getElementById('otp').value;if(otp){otpVerified=true;document.getElementById('loginDiv').style.display='none';document.getElementById('profileDiv').style.display='flex';updateProfile('Avneesh Meena','avneesh@example.com','https://via.placeholder.com/100');showNotification("Login Successful!");createFloatingIcons();}}
 
-/* RENDER FOOD MENU */
-function renderMenu(){
-let container=document.getElementById("foodContainer");
-container.innerHTML="";
-foodItems.forEach((item,index)=>{
-container.innerHTML+=`
-<div class="card">
-<img src="${item.img}">
-<div class="card-content">
-<h3>${item.name}</h3>
-<div class="price">₹${item.price}</div>
-<button class="btn" onclick="voiceOrder(${index})">Add via Voice</button>
-<button class="btn" onclick="addToCart('${item.name}',${item.price})">Add</button>
-</div>
-</div>
-`;
-});
+// Update Profile
+function updateProfile(name,email,photoURL){document.getElementById('userName').innerText=name;document.getElementById('userEmail').innerText=email;document.getElementById('profilePic').src=photoURL;}
+
+// Holographic boy
+function showHolographicBoy(){if(deliveryStarted)return;deliveryStarted=true;document.getElementById('profileDiv').style.display='none';document.getElementById('holographicBoy').style.display='flex';updateDeliveryMessage("Your order has started!");}
+function updateDeliveryMessage(msg){document.getElementById('deliveryMessage').innerText=msg;}
+
+// Show map
+function showMap(){document.getElementById('holographicBoy').style.display='none';document.getElementById('mapContainer').style.display='flex';}
+
+// Show 3D menu
+function showMenu(){if(menuVisible)return;menuVisible=true;document.getElementById('holographicBoy').style.display='none';document.getElementById('menuSection').style.display='flex';}
+
+// Chat
+function showChat(){if(chatVisible)return;chatVisible=true;document.getElementById('chatBox').style.display='block';}
+function sendMessage(){let msg=document.getElementById('chatInput').value;if(msg){appendChat("You",msg);document.getElementById('chatInput').value='';setTimeout(()=>{appendChat("Delivery Boy","Got it!");speak("Got it!");},1000);}}
+function appendChat(sender,msg){let chat=document.createElement('p');chat.innerText=sender+": "+msg;document.getElementById('chatMessages').appendChild(chat);}
+
+// Push notification
+function showNotification(message){let notif=document.createElement('div');notif.className='notification';notif.innerText=message;document.body.appendChild(notif);setTimeout(()=>{notif.remove();},4000);}
+
+// Floating holographic icons
+function createFloatingIcons(){for(let i=0;i<15;i++){let icon=document.createElement('div');icon.className='floatingIcon';icon.style.left=Math.random()*window.innerWidth+'px';icon.style.animationDuration=(5+Math.random()*10)+'s';document.body.appendChild(icon);}}
+
+// Spinning order items
+for(let i=0;i<5;i++){
+  let item=document.createElement('div');item.className='spinningItem';
+  item.style.left=Math.random()*window.innerWidth+'px';
+  item.style.top=Math.random()*window.innerHeight+'px';
+  item.style.animationDuration=(3+Math.random()*3)+'s';
+  document.body.appendChild(item);
 }
 
-/* CART FUNCTIONS */
-function addToCart(name,price){cart.push({name,price});alert(name+" added to cart");}
-function openCart(){document.getElementById("cartModal").style.display="flex";displayCart();}
-function closeCart(){document.getElementById("cartModal").style.display="none";}
-function displayCart(){let items="",total=0;cart.forEach(item=>{items+=`<p>${item.name} - ₹${item.price}</p>`;total+=item.price;});document.getElementById("cartItems").innerHTML=items;document.getElementById("total").innerHTML="Total: ₹"+total;}
-
-/* CHECKOUT */
-function checkout(){
-if(cart.length===0){alert("Cart empty!");return;}
-closeCart();
-let upi=prompt("Enter UPI ID to pay:");
-if(upi){alert("Payment Successful!");startTracking();speak("Your order is confirmed.");}
+// === Voice Interaction ===
+function startVoice(){
+  if(!('webkitSpeechRecognition' in window)){alert('Your browser does not support voice recognition.');return;}
+  let recognition=new webkitSpeechRecognition();recognition.lang='en-US';recognition.interimResults=false;recognition.maxAlternatives=1;recognition.start();
+  recognition.onresult=function(event){let userSpeech=event.results[0][0].transcript;appendChat("You",userSpeech);let response=generateResponse(userSpeech);appendChat("Delivery Boy",response);speak(response);}
+  recognition.onerror=function(event){console.log('Error in recognition: '+event.error);}
 }
-
-/* DELIVERY TRACKING */
-function startTracking(){
-document.getElementById("chatBubble").innerHTML="Order confirmed! Preparing food 🍕";
-document.getElementById("chatBubble").style.display="block";
-setTimeout(()=>{document.getElementById("chatBubble").innerHTML="Out for Delivery 🚴";},5000);
-setTimeout(()=>{document.getElementById("chatBubble").innerHTML="Delivered ✅";cart=[];},10000);
-}
-
-/* HOLOGRAPHIC DELIVERY BOY VOICE */
-function talkHolo(){
-let speech=new SpeechSynthesisUtterance();
-speech.lang="en-US";
-speech.text="Hello Avneesh! Tap on me to place your order.";
-window.speechSynthesis.speak(speech);
-document.getElementById("chatBubble").style.display="block";
-setTimeout(()=>{document.getElementById("chatBubble").style.display="none";},4000);
-}
-
-/* VOICE ORDER SYSTEM */
-function voiceOrder(index){
-if(!('webkitSpeechRecognition' in window)){alert("Voice not supported");return;}
-let recognition=new webkitSpeechRecognition();
-recognition.lang="en-US";
-recognition.start();
-recognition.onresult=function(event){
-let spoken=event.results[0][0].transcript.toLowerCase();
-if(spoken.includes("yes") || spoken.includes("add")){
-addToCart(foodItems[index].name,foodItems[index].price);
-speak(foodItems[index].name + " added to cart via voice!");
-}else{speak("Okay, not added.");}
-};
-}
-
-/* SPEAK FUNCTION */
-function speak(text){let s=new SpeechSynthesisUtterance();s.lang="en-US";s.text=text;window.speechSynthesis.speak(s);}
-window.onload=function(){let s=new SpeechSynthesisUtterance();s.lang="en-US";s.text="Welcome to Zyphor ultimate holographic delivery!";window.speechSynthesis.speak(s);};
+function speak(text){let synth=window.speechSynthesis;let utterThis=new SpeechSynthesisUtterance(text);utterThis.pitch=1.2;utterThis.rate=1;synth.speak(utterThis);}
+function generateResponse(userSpeech){userSpeech=userSpeech.toLowerCase();if(userSpeech.includes("where is my order"))return "Your order is on the way, arriving in 15 minutes!";if(userSpeech.includes("hello")||userSpeech.includes("hi"))return "Hello! How can I help you today?";if(userSpeech.includes("thank"))return "You're welcome! Enjoy your meal!";return "Got it! I'm on it.";}
 </script>
+
 </body>
 </html>
