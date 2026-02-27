@@ -3,6 +3,240 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zyphor Delivery Final</title>
+<style>
+body { margin:0; font-family:sans-serif; background:#111; color:white; }
+header { text-align:center; padding:20px; font-size:24px; background:linear-gradient(90deg,#4b6cb7,#182848);}
+.tagline { font-size:16px; color:#ffd700;}
+#login, #otp-section {display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh;}
+#login input, #login button, #otp-section input, #otp-section button { padding:10px; margin:10px; border-radius:5px; border:none;}
+#login button, #otp-section button { background:#4b6cb7; color:white; cursor:pointer;}
+#app { display:none; padding:20px;}
+#profile { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
+#profile img { width:60px; height:60px; border-radius:50%; border:2px solid #ffd700; }
+#profile div { font-size:16px; }
+#products { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
+.product { background:#222; border-radius:15px; padding:15px; text-align:center; transition: transform 0.2s;}
+.product:hover { transform:scale(1.05);}
+.product img { width:100%; height:180px; object-fit:cover; border-radius:10px;}
+.product button { margin-top:10px; padding:8px 12px; border:none; border-radius:5px; background:#4b6cb7; color:white; cursor:pointer;}
+#cart { margin-top:20px; background:#222; padding:15px; border-radius:10px;}
+#cart ul { list-style:none; padding:0; max-height:150px; overflow-y:auto;}
+#cart li { padding:5px 0; border-bottom:1px solid #444; display:flex; justify-content:space-between; }
+#chat { margin-top:20px; background:#1a1a2e; padding:10px; border-radius:10px; max-height:250px; overflow-y:auto;}
+.message { margin:5px 0; padding:8px 12px; border-radius:10px; max-width:80%; word-wrap: break-word; }
+.customer { background:#4b6cb7; color:white; margin-left:auto; text-align:right; }
+.ai { background:#fff; color:black; margin-right:auto; text-align:left; }
+#chat-input { display:flex; margin-top:10px;}
+#chat-input input { flex:1; padding:10px; border-radius:5px; border:none;}
+#chat-input button { padding:10px 15px; margin-left:5px; border:none; border-radius:5px; background:#182848; color:white; cursor:pointer;}
+#avatar-container { width:150px; height:150px; margin:auto; }
+#mic-button { margin-top:10px; padding:10px; border:none; border-radius:5px; background:#ffd700; color:#111; cursor:pointer;}
+</style>
+</head>
+<body>
+
+<header>
+    Zyphor Delivery Final<br>
+    <span class="tagline">Virtual Presence, Real Delivery</span>
+</header>
+
+<div id="login">
+    <h2>Login with Mobile</h2>
+    <input type="text" id="mobile" placeholder="Enter mobile number">
+    <button onclick="sendOTP()">Send OTP</button>
+</div>
+
+<div id="otp-section" style="display:none;">
+    <h2>Enter OTP</h2>
+    <input type="text" id="otp" placeholder="Enter OTP">
+    <button onclick="verifyOTP()">Verify OTP</button>
+</div>
+
+<div id="app">
+    <div id="profile">
+        <div id="avatar-container"></div>
+        <div>
+            <div id="user-name">Customer</div>
+            <div id="user-mobile"></div>
+        </div>
+    </div>
+    <h2>Menu</h2>
+    <div id="products"></div>
+    <div id="cart">
+        <h3>Your Orders</h3>
+        <ul id="cart-items"></ul>
+        <strong>Total: ₹<span id="total">0</span></strong>
+    </div>
+    <div id="chat"></div>
+    <div id="chat-input">
+        <input type="text" id="message" placeholder="Type your message">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+    <button id="mic-button" onclick="startMic()">🎤 Speak</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/OrbitControls.js"></script>
+
+<script>
+// OTP System
+let simulatedOTP="";
+let userMobile="";
+function sendOTP(){
+    userMobile=document.getElementById("mobile").value;
+    if(!userMobile.match(/^[0-9]{10}$/)){ alert("Enter valid 10-digit number"); return;}
+    simulatedOTP=Math.floor(1000+Math.random()*9000).toString();
+    alert(`Simulated OTP: ${simulatedOTP}`);
+    document.getElementById("login").style.display="none";
+    document.getElementById("otp-section").style.display="flex";
+}
+function verifyOTP(){
+    const otp=document.getElementById("otp").value;
+    if(otp===simulatedOTP){
+        document.getElementById("otp-section").style.display="none";
+        document.getElementById("app").style.display="block";
+        initApp();
+    } else alert("Invalid OTP");
+}
+
+// Initialize App
+let cart=[];
+const products=[
+    {name:"Pizza", price:250, img:"https://images.unsplash.com/photo-1601924572311-12e8e8f1b083?fit=crop&w=400&q=80"},
+    {name:"Burger", price:150, img:"https://images.unsplash.com/photo-1550547660-d9450f859349?fit=crop&w=400&q=80"},
+    {name:"Sushi", price:400, img:"https://images.unsplash.com/photo-1562967916-eb82221dfb32?fit=crop&w=400&q=80"},
+    {name:"Ice Cream", price:100, img:"https://images.unsplash.com/photo-1604908177522-2a30f5f3bfb4?fit=crop&w=400&q=80"},
+    {name:"Sandwich", price:120, img:"https://images.unsplash.com/photo-1604908177349-7a4de84b29b2?fit=crop&w=400&q=80"},
+    {name:"Pasta", price:300, img:"https://images.unsplash.com/photo-1617196037204-65f2d37eea56?fit=crop&w=400&q=80"}
+];
+
+function initApp(){
+    document.getElementById("user-name").textContent="Customer";
+    document.getElementById("user-mobile").textContent=userMobile;
+    loadProducts();
+    addAIMessage(`Namaste! Main aapka holographic delivery assistant hoon.`);
+    speak(`Namaste! Main aapka holographic delivery assistant hoon.`);
+}
+
+// Products & Cart
+function loadProducts(){
+    const container=document.getElementById("products");
+    container.innerHTML="";
+    products.forEach((p,i)=>{
+        const div=document.createElement("div");
+        div.className="product";
+        div.innerHTML=`<img src="${p.img}" alt="${p.name}"><h4>${p.name}</h4><strong>₹${p.price}</strong><br><button onclick="addToCart(${i})">Add to Cart</button>`;
+        container.appendChild(div);
+    });
+}
+
+function addToCart(i){
+    const existing = cart.find(item => item.name === products[i].name);
+    if(existing){ existing.quantity++; }
+    else{ cart.push({...products[i], quantity:1}); }
+    renderCart();
+    addAIMessage(`${products[i].name} cart me add ho gaya.`);
+    speak(`${products[i].name} cart me add ho gaya.`);
+}
+
+function renderCart(){
+    const container=document.getElementById("cart-items");
+    container.innerHTML="";
+    let total=0;
+    cart.forEach(item=>{
+        const li=document.createElement("li");
+        li.innerHTML=`${item.name} x${item.quantity} <span>₹${item.price*item.quantity}</span>`;
+        container.appendChild(li);
+        total+=item.price*item.quantity;
+    });
+    document.getElementById("total").textContent=total;
+}
+
+// Chat
+function addAIMessage(text){
+    const chat=document.getElementById("chat");
+    const div=document.createElement("div");
+    div.className="message ai";
+    div.textContent=text;
+    chat.appendChild(div);
+    chat.scrollTop=chat.scrollHeight;
+}
+function sendMessage(){
+    const input=document.getElementById("message");
+    const text=input.value.trim();
+    if(text=="") return;
+    const chat=document.getElementById("chat");
+    const div=document.createElement("div");
+    div.className="message customer";
+    div.textContent=text;
+    chat.appendChild(div);
+    chat.scrollTop=chat.scrollHeight;
+    input.value="";
+    setTimeout(()=>{ 
+        addAIMessage(`Aapne kaha: "${text}". Order process hoga.`);
+        speak(`Aapne kaha: ${text}. Order process hoga.`);
+    },1000);
+}
+
+// Voice
+function speak(text){
+    const msg=new SpeechSynthesisUtterance();
+    msg.text=text;
+    msg.lang='hi-IN';
+    window.speechSynthesis.speak(msg);
+}
+function startMic(){
+    if(!('webkitSpeechRecognition' in window)){
+        alert('Browser does not support voice recognition');
+        return;
+    }
+    const recognition=new webkitSpeechRecognition();
+    recognition.lang='hi-IN';
+    recognition.interimResults=false;
+    recognition.maxAlternatives=1;
+    recognition.start();
+    recognition.onresult=function(event){
+        const speech=event.results[0][0].transcript;
+        const input=document.getElementById("message");
+        input.value=speech;
+        sendMessage();
+    }
+}
+
+// 3D Avatar
+const containerAvatar=document.getElementById("avatar-container");
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(75,150/150,0.1,1000);
+const renderer=new THREE.WebGLRenderer({antialias:true, alpha:true});
+renderer.setSize(150,150);
+containerAvatar.appendChild(renderer.domElement);
+
+const controls=new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableZoom=false; controls.enablePan=false;
+
+const light=new THREE.DirectionalLight(0xffffff,1);
+light.position.set(0,1,1).normalize();
+scene.add(light);
+
+const loader=new THREE.TextureLoader();
+const texture=loader.load('https://i.imgur.com/1000005642.jpg'); 
+const geometry=new THREE.SphereGeometry(1,32,32);
+const material=new THREE.MeshPhongMaterial({map:texture});
+const sphere=new THREE.Mesh(geometry, material);
+scene.add(sphere);
+
+camera.position.z=3;
+function animate(){ requestAnimationFrame(animate); sphere.rotation.y+=0.01; renderer.render(scene,camera);}
+animate();
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Zyphor Holographic Delivery</title>
 <style>
 body { margin:0; font-family:sans-serif; background:#111; color:white; overflow-x:hidden; }
