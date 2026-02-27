@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,7 +8,6 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
 body{background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);color:white;overflow-x:hidden;}
-
 /* LOGIN */
 #loginScreen{height:100vh;display:flex;justify-content:center;align-items:center;flex-direction:column;text-align:center;}
 #loginScreen h2{color:#00fff7;font-size:28px;margin-bottom:5px;}
@@ -184,9 +182,7 @@ speak(foodItems[index].name + " added to cart via voice!");
 
 /* SPEAK FUNCTION */
 function speak(text){let s=new SpeechSynthesisUtterance();s.lang="en-US";s.text=text;window.speechSynthesis.speak(s);}
-
-/* Voice welcome on load */
-window.onload=function(){let s=new SpeechSynthesisUtterance();s.lang="en-US";s.text="Welcome to Zyphor ultimate colored holographic delivery!";window.speechSynthesis.speak(s);};
+window.onload=function(){let s=new SpeechSynthesisUtterance();s.lang="en-US";s.text="Welcome to Zyphor ultimate holographic delivery!";window.speechSynthesis.speak(s);};
 </script>
 </body>
 </html>
