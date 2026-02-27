@@ -3,41 +3,37 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zyphor Delivery Final</title>
+<title>Zyphor Ultimate Holographic Delivery</title>
 <style>
-body { margin:0; font-family:sans-serif; background:#111; color:white; }
+body { margin:0; font-family:sans-serif; background:#0d0d0d; color:white; overflow-x:hidden; }
 header { text-align:center; padding:20px; font-size:24px; background:linear-gradient(90deg,#4b6cb7,#182848);}
 .tagline { font-size:16px; color:#ffd700;}
-#login, #otp-section {display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh;}
-#login input, #login button, #otp-section input, #otp-section button { padding:10px; margin:10px; border-radius:5px; border:none;}
-#login button, #otp-section button { background:#4b6cb7; color:white; cursor:pointer;}
+#login,#otp-section {display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh;}
+#login input,#login button,#otp-section input,#otp-section button { padding:10px; margin:10px; border-radius:5px; border:none;}
+#login button,#otp-section button { background:#4b6cb7; color:white; cursor:pointer;}
 #app { display:none; padding:20px;}
 #profile { display:flex; align-items:center; gap:15px; margin-bottom:20px; }
 #profile img { width:60px; height:60px; border-radius:50%; border:2px solid #ffd700; }
 #profile div { font-size:16px; }
 #products { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:20px; }
-.product { background:#222; border-radius:15px; padding:15px; text-align:center; transition: transform 0.2s;}
+.product { background:#222; border-radius:15px; padding:15px; text-align:center; transition: transform 0.2s; cursor:pointer; box-shadow: 0 0 15px #4b6cb7;}
 .product:hover { transform:scale(1.05);}
 .product img { width:100%; height:180px; object-fit:cover; border-radius:10px;}
 .product button { margin-top:10px; padding:8px 12px; border:none; border-radius:5px; background:#4b6cb7; color:white; cursor:pointer;}
-#cart { margin-top:20px; background:#222; padding:15px; border-radius:10px;}
+#cart { margin-top:20px; background:#222; padding:15px; border-radius:10px; box-shadow: 0 0 15px #ffd700;}
 #cart ul { list-style:none; padding:0; max-height:150px; overflow-y:auto;}
 #cart li { padding:5px 0; border-bottom:1px solid #444; display:flex; justify-content:space-between; }
-#chat { margin-top:20px; background:#1a1a2e; padding:10px; border-radius:10px; max-height:250px; overflow-y:auto;}
-.message { margin:5px 0; padding:8px 12px; border-radius:10px; max-width:80%; word-wrap: break-word; }
-.customer { background:#4b6cb7; color:white; margin-left:auto; text-align:right; }
-.ai { background:#fff; color:black; margin-right:auto; text-align:left; }
-#chat-input { display:flex; margin-top:10px;}
-#chat-input input { flex:1; padding:10px; border-radius:5px; border:none;}
-#chat-input button { padding:10px 15px; margin-left:5px; border:none; border-radius:5px; background:#182848; color:white; cursor:pointer;}
-#avatar-container { width:150px; height:150px; margin:auto; }
-#mic-button { margin-top:10px; padding:10px; border:none; border-radius:5px; background:#ffd700; color:#111; cursor:pointer;}
+#avatar-container { width:300px; height:400px; margin:auto; filter: drop-shadow(0 0 20px #4b6cb7);}
+#mic-button { margin-top:20px; padding:10px 15px; border:none; border-radius:5px; background:#ffd700; color:#111; cursor:pointer;}
+#neon-bg { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; }
 </style>
 </head>
 <body>
 
+<div id="neon-bg"></div>
+
 <header>
-    Zyphor Delivery Final<br>
+    Zyphor Ultimate Holographic Delivery<br>
     <span class="tagline">Virtual Presence, Real Delivery</span>
 </header>
 
@@ -61,28 +57,26 @@ header { text-align:center; padding:20px; font-size:24px; background:linear-grad
             <div id="user-mobile"></div>
         </div>
     </div>
+
     <h2>Menu</h2>
     <div id="products"></div>
+
     <div id="cart">
         <h3>Your Orders</h3>
         <ul id="cart-items"></ul>
-        <strong>Total: ₹<span id="total">0</span></strong>
+        <strong>Total: ₹<span id="total">0</span></strong><br>
+        <button onclick="placeOrder()" style="margin-top:10px; padding:8px 15px; border:none; border-radius:5px; background:#4b6cb7; color:white; cursor:pointer;">Place Order</button>
     </div>
-    <div id="chat"></div>
-    <div id="chat-input">
-        <input type="text" id="message" placeholder="Type your message">
-        <button onclick="sendMessage()">Send</button>
-    </div>
-    <button id="mic-button" onclick="startMic()">🎤 Speak</button>
+
+    <button id="mic-button" onclick="startMic()">🎤 Speak to Order</button>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/OrbitControls.js"></script>
 
 <script>
-// OTP System
-let simulatedOTP="";
-let userMobile="";
+// OTP Login
+let simulatedOTP="", userMobile="";
 function sendOTP(){
     userMobile=document.getElementById("mobile").value;
     if(!userMobile.match(/^[0-9]{10}$/)){ alert("Enter valid 10-digit number"); return;}
@@ -100,7 +94,7 @@ function verifyOTP(){
     } else alert("Invalid OTP");
 }
 
-// Initialize App
+// Menu & Cart
 let cart=[];
 const products=[
     {name:"Pizza", price:250, img:"https://images.unsplash.com/photo-1601924572311-12e8e8f1b083?fit=crop&w=400&q=80"},
@@ -115,14 +109,10 @@ function initApp(){
     document.getElementById("user-name").textContent="Customer";
     document.getElementById("user-mobile").textContent=userMobile;
     loadProducts();
-    addAIMessage(`Namaste! Main aapka holographic delivery assistant hoon.`);
-    speak(`Namaste! Main aapka holographic delivery assistant hoon.`);
+    speak("Namaste! Main aapka holographic delivery assistant hoon. Aap apna order bol sakte hain.");
 }
-
-// Products & Cart
 function loadProducts(){
-    const container=document.getElementById("products");
-    container.innerHTML="";
+    const container=document.getElementById("products"); container.innerHTML="";
     products.forEach((p,i)=>{
         const div=document.createElement("div");
         div.className="product";
@@ -130,307 +120,61 @@ function loadProducts(){
         container.appendChild(div);
     });
 }
-
 function addToCart(i){
-    const existing = cart.find(item => item.name === products[i].name);
-    if(existing){ existing.quantity++; }
-    else{ cart.push({...products[i], quantity:1}); }
-    renderCart();
-    addAIMessage(`${products[i].name} cart me add ho gaya.`);
-    speak(`${products[i].name} cart me add ho gaya.`);
+    const existing=cart.find(item=>item.name===products[i].name);
+    if(existing){ existing.quantity++; } else{ cart.push({...products[i], quantity:1}); }
+    renderCart(); speak(`${products[i].name} aapke cart me add ho gaya.`);
 }
-
 function renderCart(){
-    const container=document.getElementById("cart-items");
-    container.innerHTML="";
-    let total=0;
+    const container=document.getElementById("cart-items"); container.innerHTML=""; let total=0;
     cart.forEach(item=>{
         const li=document.createElement("li");
         li.innerHTML=`${item.name} x${item.quantity} <span>₹${item.price*item.quantity}</span>`;
-        container.appendChild(li);
-        total+=item.price*item.quantity;
+        container.appendChild(li); total+=item.price*item.quantity;
     });
     document.getElementById("total").textContent=total;
 }
-
-// Chat
-function addAIMessage(text){
-    const chat=document.getElementById("chat");
-    const div=document.createElement("div");
-    div.className="message ai";
-    div.textContent=text;
-    chat.appendChild(div);
-    chat.scrollTop=chat.scrollHeight;
-}
-function sendMessage(){
-    const input=document.getElementById("message");
-    const text=input.value.trim();
-    if(text=="") return;
-    const chat=document.getElementById("chat");
-    const div=document.createElement("div");
-    div.className="message customer";
-    div.textContent=text;
-    chat.appendChild(div);
-    chat.scrollTop=chat.scrollHeight;
-    input.value="";
-    setTimeout(()=>{ 
-        addAIMessage(`Aapne kaha: "${text}". Order process hoga.`);
-        speak(`Aapne kaha: ${text}. Order process hoga.`);
-    },1000);
+function placeOrder(){
+    if(cart.length===0){ speak("Aapka cart khali hai."); return;}
+    speak("Aapka order confirm ho gaya. Dhanyavaad!");
+    cart=[]; renderCart();
 }
 
-// Voice
-function speak(text){
-    const msg=new SpeechSynthesisUtterance();
-    msg.text=text;
-    msg.lang='hi-IN';
-    window.speechSynthesis.speak(msg);
-}
+// Voice AI
+function speak(text){ const msg=new SpeechSynthesisUtterance(); msg.text=text; msg.lang='hi-IN'; window.speechSynthesis.speak(msg);}
 function startMic(){
-    if(!('webkitSpeechRecognition' in window)){
-        alert('Browser does not support voice recognition');
-        return;
-    }
-    const recognition=new webkitSpeechRecognition();
-    recognition.lang='hi-IN';
-    recognition.interimResults=false;
-    recognition.maxAlternatives=1;
-    recognition.start();
-    recognition.onresult=function(event){
-        const speech=event.results[0][0].transcript;
-        const input=document.getElementById("message");
-        input.value=speech;
-        sendMessage();
-    }
+    if(!('webkitSpeechRecognition' in window)){ alert('Browser does not support voice recognition'); return;}
+    const recognition=new webkitSpeechRecognition(); recognition.lang='hi-IN'; recognition.interimResults=false; recognition.maxAlternatives=1;
+    recognition.start(); recognition.onresult=function(event){ const speech=event.results[0][0].transcript; processOrder(speech);}
+}
+function processOrder(text){
+    const found=products.find(p=>text.toLowerCase().includes(p.name.toLowerCase()));
+    if(found){ addToCart(products.indexOf(found)); } else speak("Maf kijiye, ye item menu me nahi hai.");
 }
 
-// 3D Avatar
+// 3D Avatar Full Body Simulation
 const containerAvatar=document.getElementById("avatar-container");
 const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(75,150/150,0.1,1000);
-const renderer=new THREE.WebGLRenderer({antialias:true, alpha:true});
-renderer.setSize(150,150);
+const camera=new THREE.PerspectiveCamera(75,300/400,0.1,1000);
+const renderer=new THREE.WebGLRenderer({antialias:true, alpha:true}); renderer.setSize(300,400);
 containerAvatar.appendChild(renderer.domElement);
-
-const controls=new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableZoom=false; controls.enablePan=false;
-
-const light=new THREE.DirectionalLight(0xffffff,1);
-light.position.set(0,1,1).normalize();
-scene.add(light);
-
-const loader=new THREE.TextureLoader();
-const texture=loader.load('https://i.imgur.com/1000005642.jpg'); 
-const geometry=new THREE.SphereGeometry(1,32,32);
-const material=new THREE.MeshPhongMaterial({map:texture});
-const sphere=new THREE.Mesh(geometry, material);
-scene.add(sphere);
-
-camera.position.z=3;
-function animate(){ requestAnimationFrame(animate); sphere.rotation.y+=0.01; renderer.render(scene,camera);}
+const controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableZoom=false; controls.enablePan=false;
+const light=new THREE.DirectionalLight(0xffffff,1); light.position.set(0,1,1).normalize(); scene.add(light);
+const loader=new THREE.TextureLoader(); const texture=loader.load('https://i.imgur.com/1000005642.jpg'); 
+const bodyGeometry=new THREE.CapsuleGeometry(0.8,2,4,8);
+const bodyMaterial=new THREE.MeshPhongMaterial({map:texture});
+const avatar=new THREE.Mesh(bodyGeometry, bodyMaterial);
+scene.add(avatar);
+camera.position.z=5;
+let lipsPhase=0;
+function animate(){ requestAnimationFrame(animate); avatar.rotation.y+=0.01; if(window.speechSynthesis.speaking){ lipsPhase+=0.1; avatar.scale.y=1+Math.sin(lipsPhase)*0.05; } else { avatar.scale.y=1; lipsPhase=0; } renderer.render(scene,camera);}
 animate();
-</script>
 
-</body>
-</html><!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Zyphor Holographic Delivery</title>
-<style>
-body { margin:0; font-family:sans-serif; background:#111; color:white; overflow-x:hidden; }
-header { text-align:center; padding:20px; font-size:24px; background:linear-gradient(90deg,#4b6cb7,#182848);}
-.tagline { font-size:16px; color:#ffd700;}
-#login {display:flex; flex-direction:column; justify-content:center; align-items:center; height:100vh;}
-#login input, #login button { padding:10px; margin:10px; border-radius:5px; border:none;}
-#login button { background:#4b6cb7; color:white; cursor:pointer;}
-#app { display:none; padding:20px;}
-#products { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:15px;}
-.product { background:#222; border-radius:10px; padding:10px; text-align:center;}
-.product img { width:100%; height:150px; object-fit:cover; border-radius:10px;}
-.product button { margin-top:10px; padding:5px 10px; border:none; border-radius:5px; background:#4b6cb7; color:white; cursor:pointer;}
-#cart { margin-top:20px; background:#222; padding:10px; border-radius:10px;}
-#cart ul { list-style:none; padding:0; }
-#chat { margin-top:20px; background:#1a1a2e; padding:10px; border-radius:10px; max-height:250px; overflow-y:auto;}
-.message { margin:5px 0; padding:8px 12px; border-radius:10px; max-width:80%; }
-.customer { background:#4b6cb7; color:white; margin-left:auto; text-align:right; }
-.ai { background:#fff; color:black; margin-right:auto; text-align:left; }
-#chat-input { display:flex; margin-top:10px;}
-#chat-input input { flex:1; padding:10px; border-radius:5px; border:none;}
-#chat-input button { padding:10px 15px; margin-left:5px; border:none; border-radius:5px; background:#182848; color:white; cursor:pointer;}
-#avatar-container { width:300px; height:300px; margin:auto; }
-#mic-button { margin-top:10px; padding:10px; border:none; border-radius:5px; background:#ffd700; color:#111; cursor:pointer;}
-</style>
-</head>
-<body>
-
-<header>
-    Zyphor Delivery<br>
-    <span class="tagline">Virtual Presence, Real Delivery</span>
-</header>
-
-<div id="login">
-    <h2>Login</h2>
-    <input type="text" id="username" placeholder="Enter your name">
-    <input type="text" id="phone" placeholder="Enter mobile number">
-    <button onclick="login()">Namaste & Login</button>
-    <div id="avatar-container"></div>
-</div>
-
-<div id="app">
-    <h2>Menu</h2>
-    <div id="products"></div>
-    <div id="cart">
-        <h3>Cart</h3>
-        <ul id="cart-items"></ul>
-        <strong>Total: ₹<span id="total">0</span></strong>
-    </div>
-    <div id="chat"></div>
-    <div id="chat-input">
-        <input type="text" id="message" placeholder="Type your message">
-        <button onclick="sendMessage()">Send</button>
-    </div>
-    <button id="mic-button" onclick="startMic()">🎤 Speak</button>
-</div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/three@0.134/examples/js/controls/OrbitControls.js"></script>
-
-<script>
-// Products & cart
-let cart=[];
-const products=[
-    {name:"Pizza", price:250, img:"https://images.unsplash.com/photo-1601924572311-12e8e8f1b083?fit=crop&w=400&q=80"},
-    {name:"Burger", price:150, img:"https://images.unsplash.com/photo-1550547660-d9450f859349?fit=crop&w=400&q=80"},
-    {name:"Sushi", price:400, img:"https://images.unsplash.com/photo-1562967916-eb82221dfb32?fit=crop&w=400&q=80"},
-];
-
-// Login
-function login(){
-    const user=document.getElementById("username").value;
-    const phone=document.getElementById("phone").value;
-    if(user && phone){
-        document.getElementById("login").style.display="none";
-        document.getElementById("app").style.display="block";
-        loadProducts();
-        addAIMessage(`Namaste ${user}! Main aapka holographic delivery assistant hoon.`);
-        speak(`Namaste ${user}! Main aapka holographic delivery assistant hoon.`);
-    } else { alert("Enter name and phone!"); }
-}
-
-// Load Products
-function loadProducts(){
-    const container=document.getElementById("products");
-    products.forEach((p,i)=>{
-        const div=document.createElement("div");
-        div.className="product";
-        div.innerHTML=`<img src="${p.img}" alt="${p.name}"><h4>${p.name}</h4><strong>₹${p.price}</strong><br><button onclick="addToCart(${i})">Add to Cart</button>`;
-        container.appendChild(div);
-    });
-}
-
-// Cart functions
-function addToCart(i){
-    cart.push(products[i]);
-    renderCart();
-    addAIMessage(`${products[i].name} cart me add ho gaya.`);
-    speak(`${products[i].name} cart me add ho gaya.`);
-}
-
-function renderCart(){
-    const container=document.getElementById("cart-items");
-    container.innerHTML="";
-    let total=0;
-    cart.forEach(item=>{
-        const li=document.createElement("li");
-        li.textContent=`${item.name} - ₹${item.price}`;
-        container.appendChild(li);
-        total+=item.price;
-    });
-    document.getElementById("total").textContent=total;
-}
-
-// Chat
-function addAIMessage(text){
-    const chat=document.getElementById("chat");
-    const div=document.createElement("div");
-    div.className="message ai";
-    div.textContent=text;
-    chat.appendChild(div);
-    chat.scrollTop=chat.scrollHeight;
-}
-
-function sendMessage(){
-    const input=document.getElementById("message");
-    const text=input.value.trim();
-    if(text=="") return;
-    const chat=document.getElementById("chat");
-    const div=document.createElement("div");
-    div.className="message customer";
-    div.textContent=text;
-    chat.appendChild(div);
-    chat.scrollTop=chat.scrollHeight;
-    input.value="";
-    setTimeout(()=>{ 
-        addAIMessage(`Aapne kaha: "${text}". Order process hoga.`);
-        speak(`Aapne kaha: ${text}. Order process hoga.`);
-    },1000);
-}
-
-// Voice
-function speak(text){
-    const msg=new SpeechSynthesisUtterance();
-    msg.text=text;
-    msg.lang='hi-IN';
-    window.speechSynthesis.speak(msg);
-}
-
-// Mic input
-function startMic(){
-    if(!('webkitSpeechRecognition' in window)){
-        alert('Browser does not support voice recognition');
-        return;
-    }
-    const recognition=new webkitSpeechRecognition();
-    recognition.lang='hi-IN';
-    recognition.interimResults=false;
-    recognition.maxAlternatives=1;
-    recognition.start();
-    recognition.onresult=function(event){
-        const speech=event.results[0][0].transcript;
-        const input=document.getElementById("message");
-        input.value=speech;
-        sendMessage();
-    }
-}
-
-// 3D Avatar
-const container=document.getElementById("avatar-container");
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(75,300/300,0.1,1000);
-const renderer=new THREE.WebGLRenderer({antialias:true, alpha:true});
-renderer.setSize(300,300);
-container.appendChild(renderer.domElement);
-
-const controls=new THREE.OrbitControls(camera, renderer.domElement);
-controls.enableZoom=false; controls.enablePan=false;
-
-const light=new THREE.DirectionalLight(0xffffff,1);
-light.position.set(0,1,1).normalize();
-scene.add(light);
-
-// Avatar Sphere with your photo
-const loader=new THREE.TextureLoader();
-const texture=loader.load('https://i.imgur.com/1000005642.jpg'); 
-const geometry=new THREE.SphereGeometry(1,32,32);
-const material=new THREE.MeshPhongMaterial({map:texture});
-const sphere=new THREE.Mesh(geometry, material);
-scene.add(sphere);
-
-camera.position.z=3;
-function animate(){ requestAnimationFrame(animate); sphere.rotation.y+=0.01; renderer.render(scene,camera);}
-animate();
+// Neon background
+const neonCanvas=document.createElement("canvas"); neonCanvas.width=window.innerWidth; neonCanvas.height=window.innerHeight;
+document.getElementById("neon-bg").appendChild(neonCanvas); const neonCtx=neonCanvas.getContext("2d");
+function neonAnimate(){ neonCtx.clearRect(0,0,neonCanvas.width, neonCanvas.height); for(let i=0;i<150;i++){ neonCtx.fillStyle=`rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},255,0.1)`; neonCtx.beginPath(); neonCtx.arc(Math.random()*neonCanvas.width, Math.random()*neonCanvas.height, Math.random()*2,0,2*Math.PI); neonCtx.fill(); } requestAnimationFrame(neonAnimate);}
+neonAnimate();
 </script>
 
 </body>
