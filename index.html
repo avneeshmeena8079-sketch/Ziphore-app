@@ -1,71 +1,127 @@
- speak("Namaste Avneesh Meena! Main aapka holographic delivery assistant hoon. Aap apna order bol sakte hain.");
-}
-function loadProducts(){
-    const container=document.getElementById("products"); container.innerHTML="";
-    products.forEach((p,i)=>{
-        const div=document.createElement("div");
-        div.className="product";
-        div.innerHTML=`<img src="${p.img}" alt="${p.name}"><h4>${p.name}</h4><strong>₹${p.price}</strong><br><button onclick="addToCart(${i})">Add to Cart</button>`;
-        container.appendChild(div);
-    });
-}
-function addToCart(i){
-    const existing=cart.find(item=>item.name===products[i].name);
-    if(existing){ existing.quantity++; } else{ cart.push({...products[i], quantity:1}); }
-    renderCart(); speak(`${products[i].name} aapke cart me add ho gaya.`);
-}
-function renderCart(){
-    const container=document.getElementById("cart-items"); container.innerHTML=""; let total=0;
-    cart.forEach(item=>{
-        const li=document.createElement("li");
-        li.innerHTML=`${item.name} x${item.quantity} <span>₹${item.price*item.quantity}</span>`;
-        container.appendChild(li); total+=item.price*item.quantity;
-    });
-    document.getElementById("total").textContent=total;
-}
-function placeOrder(){
-    if(cart.length===0){ speak("Aapka cart khali hai."); return;}
-    speak("Aapka order confirm ho gaya. Dhanyavaad Avneesh Meena!");
-    cart=[]; renderCart();
-}
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zyphor Delivery App</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif;}
+body{background:#f0f0f5;color:#333;}
+#loginPage{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100vh;background:#fff;text-align:center;}
+#loginPage h1{margin-bottom:10px;color:#ff3b30;}
+#loginPage h3{margin-bottom:20px;color:#333;font-weight:normal;}
+#loginPage input{padding:10px;margin:5px 0;width:250px;border-radius:5px;border:1px solid #ccc;}
+#loginPage button{padding:10px 20px;margin-top:10px;border:none;border-radius:5px;background-color:#ff3b30;color:#fff;cursor:pointer;}
+#otpInput{display:none;}
+#app{display:none;padding:10px;}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+header h2{color:#ff3b30;}
+header button{padding:5px 10px;background:#ff3b30;color:#fff;border:none;border-radius:5px;cursor:pointer;}
+#profile{background:#fff;padding:10px;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);margin-bottom:10px;text-align:center;}
+#profile img{width:80px;height:80px;border-radius:50%;object-fit:cover;margin-bottom:5px;}
+#avatar3D{width:100%;height:250px;margin:10px 0;}
+.menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:15px;}
+.item{background:#fff;padding:10px;border-radius:10px;text-align:center;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+.item img{width:100%;height:120px;object-fit:cover;border-radius:10px;}
+.item h4{margin:10px 0 5px;}
+.item p{margin-bottom:10px;color:#666;}
+.item button{padding:5px 10px;border:none;border-radius:5px;background-color:#ff3b30;color:#fff;cursor:pointer;}
+#cart{margin-top:10px;background:#fff;padding:10px;border-radius:10px;box-shadow:0 2px 5px rgba(0,0,0,0.1);}
+#cart h3{margin-bottom:10px;}
+#cart ul{list-style:none;}
+#cart li{display:flex;justify-content:space-between;margin-bottom:5px;}
+#cart button{margin-top:10px;width:100%;padding:10px;background-color:#28a745;color:#fff;border:none;border-radius:5px;cursor:pointer;}
+#paymentModal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);justify-content:center;align-items:center;}
+#paymentModal div{background:#fff;padding:20px;border-radius:10px;width:300px;text-align:center;}
+#paymentModal button{padding:8px 15px;margin:5px;border:none;border-radius:5px;background:#ff3b30;color:#fff;cursor:pointer;}
+</style>
+</head>
+<body>
 
-// Voice AI
-function speak(text){ const msg=new SpeechSynthesisUtterance(); msg.text=text; msg.lang='hi-IN'; window.speechSynthesis.speak(msg);}
-function startMic(){
-    if(!('webkitSpeechRecognition' in window)){ alert('Browser does not support voice recognition'); return;}
-    const recognition=new webkitSpeechRecognition(); recognition.lang='hi-IN'; recognition.interimResults=false; recognition.maxAlternatives=1;
-    recognition.start(); recognition.onresult=function(event){ const speech=event.results[0][0].transcript; processOrder(speech);}
-}
-function processOrder(text){
-    const found=products.find(p=>text.toLowerCase().includes(p.name.toLowerCase()));
-    if(found){ addToCart(products.indexOf(found)); } else speak("Maf kijiye, ye item menu me nahi hai.");
-}
+<!-- Login -->
+<div id="loginPage">
+<h1>Zyphor</h1>
+<h3>Teglin Virtual Presence – Real Delivery</h3>
+<input type="text" id="phone" placeholder="मोबाइल नंबर डालें">
+<button onclick="sendOTP()">OTP भेजें</button>
+<div id="otpInput">
+<input type="text" id="otp" placeholder="OTP डालें">
+<button onclick="verifyOTP()">लॉगिन करें</button>
+</div>
+</div>
+
+<!-- App -->
+<div id="app">
+<header>
+<h2>Zyphor Menu</h2>
+<button onclick="logout()">Logout</button>
+</header>
+
+<div id="profile">
+<img id="profilePic" src="https://via.placeholder.com/80?text=Avatar" alt="Profile">
+<h4 id="profileName">नाम</h4>
+<input type="file" id="profileUpload" onchange="uploadProfile(event)">
+<button onclick="viewHistory()">ऑर्डर हिस्ट्री देखें</button>
+</div>
+
+<div id="avatar3D"></div>
+
+<div class="menu" id="menuItems"></div>
+
+<div id="cart">
+<h3>आपका ऑर्डर:</h3>
+<ul id="cartList"></ul>
+<button onclick="openPayment()">पेमेंट करें</button>
+</div>
+</div>
+
+<!-- Payment Modal -->
+<div id="paymentModal">
+<div>
+<h3>भुगतान विधि चुनें</h3>
+<button onclick="pay('Credit/Debit')">Credit/Debit</button>
+<button onclick="pay('UPI')">UPI</button>
+<button onclick="pay('Cash on Delivery')">Cash on Delivery</button>
+<button onclick="closePayment()">Cancel</button>
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/loaders/GLTFLoader.js"></script>
+
+<script>
+let generatedOTP='', customer={name:'',phone:'',profile:''}, cart=[];
+const menu=[{id:1,name:"पिज़्ज़ा",price:250,img:"https://via.placeholder.com/150?text=Pizza"},{id:2,name:"बर्गर",price:120,img:"https://via.placeholder.com/150?text=Burger"},{id:3,name:"सैंडविच",price:100,img:"https://via.placeholder.com/150?text=Sandwich"},{id:4,name:"पास्ता",price:180,img:"https://via.placeholder.com/150?text=Pasta"},{id:5,name:"मोमो",price:90,img:"https://via.placeholder.com/150?text=Momo"},{id:6,name:"सूप",price:70,img:"https://via.placeholder.com/150?text=Soup"}];
+
+// OTP Functions
+function sendOTP(){ const phone=document.getElementById('phone').value; if(phone.length<10){alert('सही मोबाइल नंबर डालें'); return;} generatedOTP=Math.floor(1000+Math.random()*9000).toString(); alert(`आपका OTP है: ${generatedOTP}`); document.getElementById('otpInput').style.display='block';}
+function verifyOTP(){ const otp=document.getElementById('otp').value; if(otp===generatedOTP){ customer.phone=document.getElementById('phone').value; customer.name='ग्राहक'; document.getElementById('loginPage').style.display='none'; document.getElementById('app').style.display='block'; renderProfile(); renderMenu(); init3DHumanAvatar(); speak('स्वागत है! Zyphor में आपका स्वागत है!');} else alert('गलत OTP!');}
+function logout(){cart=[]; document.getElementById('cartList').innerHTML=''; document.getElementById('app').style.display='none'; document.getElementById('loginPage').style.display='flex'; document.getElementById('otpInput').style.display='none'; document.getElementById('otp').value='';}
+
+// Profile
+function uploadProfile(e){ const reader=new FileReader(); reader.onload=function(){customer.profile=reader.result;renderProfile();}; reader.readAsDataURL(e.target.files[0]);}
+function renderProfile(){ document.getElementById('profilePic').src=customer.profile||'https://via.placeholder.com/80?text=Avatar'; document.getElementById('profileName').innerText=customer.name;}
+
+// Menu
+function renderMenu(){ const menuDiv=document.getElementById('menuItems'); menuDiv.innerHTML=''; menu.forEach(item=>{const div=document.createElement('div'); div.className='item'; div.innerHTML=`<img src="${item.img}" alt="${item.name}"><h4>${item.name}</h4><p>₹${item.price}</p><button onclick="addToCart(${item.id})">Add to Cart</button>`; menuDiv.appendChild(div);});}
+function addToCart(id){const item=menu.find(i=>i.id===id); cart.push(item); renderCart(); speak(`${item.name} कार्ट में जोड़ा गया।`);}
+function renderCart(){const cartList=document.getElementById('cartList'); cartList.innerHTML=''; cart.forEach((item,index)=>{const li=document.createElement('li'); li.innerHTML=`${item.name} - ₹${item.price} <button onclick="removeFromCart(${index})">❌</button>`; cartList.appendChild(li);});}
+function removeFromCart(index){cart.splice(index,1); renderCart();}
+
+// Payment Modal
+function openPayment(){ if(cart.length===0){alert('पहले ऑर्डर चुनें!'); return;} document.getElementById('paymentModal').style.display='flex';}
+function closePayment(){document.getElementById('paymentModal').style.display='none';}
+function pay(method){ let total=cart.reduce((sum,i)=>sum+i.price,0); let history=JSON.parse(localStorage.getItem('zyphor_orders_'+customer.phone))||[]; history.push({date:new Date().toLocaleString(),items:[...cart],total,method}); localStorage.setItem('zyphor_orders_'+customer.phone,JSON.stringify(history)); alert(`भुगतान ${method} से हो गया! कुल: ₹${total}`); cart=[]; renderCart(); closePayment(); speak(`आपका ऑर्डर ${method} से हो गया। कुल राशि ${total} रुपये।`);}
+
+// Order History
+function viewHistory(){let history=JSON.parse(localStorage.getItem('zyphor_orders_'+customer.phone))||[]; if(history.length===0){alert('कोई पिछला ऑर्डर नहीं है');return;} let msg='पिछले ऑर्डर:\n'; history.forEach(h=>{msg+=`${h.date} - ₹${h.total} - ${h.method||''}\n`;}); alert(msg);}
+
+// AI Voice
+function speak(text){if('speechSynthesis' in window){const u=new SpeechSynthesisUtterance(text); u.lang='hi-IN'; window.speechSynthesis.speak(u);}}
 
 // 3D Avatar
-const containerAvatar=document.getElementById("avatar-container");
-const scene=new THREE.Scene();
-const camera=new THREE.PerspectiveCamera(75,containerAvatar.offsetWidth/containerAvatar.offsetHeight,0.1,1000);
-const renderer=new THREE.WebGLRenderer({antialias:true, alpha:true}); renderer.setSize(containerAvatar.offsetWidth, containerAvatar.offsetHeight);
-containerAvatar.appendChild(renderer.domElement);
-const controls=new THREE.OrbitControls(camera, renderer.domElement); controls.enableZoom=false; controls.enablePan=false;
-const light=new THREE.DirectionalLight(0xffffff,1); light.position.set(0,1,1).normalize(); scene.add(light);
-const loader=new THREE.TextureLoader(); const texture=loader.load('https://i.imgur.com/1000005642.jpg'); 
-const bodyGeometry=new THREE.CapsuleGeometry(0.8,2,4,8);
-const bodyMaterial=new THREE.MeshPhongMaterial({map:texture});
-const avatar=new THREE.Mesh(bodyGeometry, bodyMaterial);
-scene.add(avatar);
-camera.position.z=5;
-let lipsPhase=0;
-function animate(){ requestAnimationFrame(animate); avatar.rotation.y+=0.01; if(window.speechSynthesis.speaking){ lipsPhase+=0.1; avatar.scale.y=1+Math.sin(lipsPhase)*0.05; } else { avatar.scale.y=1; lipsPhase=0; } renderer.render(scene,camera);}
-animate();
-
-// Neon background
-const neonCanvas=document.createElement("canvas"); neonCanvas.width=window.innerWidth; neonCanvas.height=window.innerHeight;
-document.getElementById("neon-bg").appendChild(neonCanvas); const neonCtx=neonCanvas.getContext("2d");
-function neonAnimate(){ neonCtx.clearRect(0,0,neonCanvas.width, neonCanvas.height); for(let i=0;i<150;i++){ neonCtx.fillStyle=`rgba(${Math.floor(Math.random()*255)},${Math.floor(Math.random()*255)},255,0.1)`; neonCtx.beginPath(); neonCtx.arc(Math.random()*neonCanvas.width, Math.random()*neonCanvas.height, Math.random()*2,0,2*Math.PI); neonCtx.fill(); } requestAnimationFrame(neonAnimate);}
-neonAnimate();
+function init3DHumanAvatar(){const scene=new THREE.Scene(); const camera=new THREE.PerspectiveCamera(75, window.innerWidth/300,0.1,1000); const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(window.innerWidth,250); document.getElementById('avatar3D').appendChild(renderer.domElement); const light=new THREE.PointLight(0x00ffff,1,50); light.position.set(0,5,5); scene.add(light); const loader=new THREE.GLTFLoader(); loader.load('avatar.glb',function(gltf){const model=gltf.scene; model.scale.set(1.5,1.5,1.5); scene.add(model); function animate(){requestAnimationFrame(animate); model.rotation.y+=0.01; renderer.render(scene,camera);} animate();},undefined,function(e){console.error(e);}); camera.position.z=5;}
 </script>
 
 </body>
 </html>
-   
