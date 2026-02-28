@@ -125,3 +125,58 @@ function init3DHumanAvatar(){const scene=new THREE.Scene(); const camera=new THR
 
 </body>
 </html>
+<!-- App me kahin menu ke upar -->
+<div id="holoDelivery" style="width:100%;height:300px;margin:10px 0;"></div>j
+// Holographic delivery boy 3D + AI voice interaction
+function initHoloDelivery(){
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(75, window.innerWidth/300,0.1,1000);
+  const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true});
+  renderer.setSize(window.innerWidth,300);
+  document.getElementById('holoDelivery').appendChild(renderer.domElement);
+
+  // Holographic light effect
+  const light=new THREE.PointLight(0x00ffff,1.5,50);
+  light.position.set(0,5,5);
+  scene.add(light);
+
+  // GLTF Loader (replace with real human 3D model)
+  const loader=new THREE.GLTFLoader();
+  loader.load('avatar.glb', function(gltf){
+    const model=gltf.scene;
+    model.scale.set(1.5,1.5,1.5);
+    scene.add(model);
+
+    // Animate
+    function animate(){
+      requestAnimationFrame(animate);
+      model.rotation.y += 0.01; // Rotate for holographic effect
+      renderer.render(scene,camera);
+    }
+    animate();
+
+    // Start greeting & ask for order
+    speak("नमस्ते! मैं आपका हॉलोग्राफिक डिलीवरी बॉय हूँ। कृपया अपना ऑर्डर चुनें।");
+  }, undefined, function(error){console.error(error);});
+
+  camera.position.z = 5;
+}
+
+// AI Voice helper
+function speak(text){
+  if('speechSynthesis' in window){
+    const utter=new SpeechSynthesisUtterance(text);
+    utter.lang='hi-IN';
+    window.speechSynthesis.speak(utter);
+  }
+}
+
+// Call initHoloDelivery after login
+// verifyOTP ke andar login success me add kare:
+initHoloDelivery();
+function addToCart(id){
+  const item=menu.find(i=>i.id===id);
+  cart.push(item);
+  renderCart();
+  speak(`${item.name} कार्ट में जोड़ दिया गया। क्या आप और कुछ ऑर्डर करना चाहेंगे?`);
+}
